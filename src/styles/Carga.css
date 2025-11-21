@@ -1,0 +1,86 @@
+/* src/styles/Carga.css */
+
+/* reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+.contenedorCarga {
+    /* Estilos de centrado vertical y horizontal que tenías en body */
+    background-color: #000;
+    color: #fff;
+    font-family: 'Georgia', serif;
+    display: flex;
+    flex-direction: column; /* Apila los elementos */
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+    /* Esto lo convierte en una página completa */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* contenedor de contenido */
+.contenedorCarga > * {
+    max-width: 400px;
+    padding: 0 20px;
+}
+
+/* logo con bordes redondeados */
+.logoCarga {
+    /* Asegúrate de que la ruta sea correcta desde public/IMG */
+    height: 60px; 
+    margin-bottom: 20px;
+    object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+}
+
+/* mensaje de bienvenida con fade */
+.mensaje {
+    font-size: 16px;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* barra de carga con animación */
+.barraCarga {
+    width: 300px; /* Ancho fijo para la barra */
+    height: 4px;
+    background: #444;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+/* animación interna de la barra */
+.barraCarga::before {
+    content: "";
+    position: absolute;
+    width: 40%;
+    height: 100%;
+    background: #fff;
+    animation: mover 2s linear infinite;
+}
+
+/* animación de desplazamiento */
+@keyframes mover {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}
+
+/* animación de entrada del mensaje */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

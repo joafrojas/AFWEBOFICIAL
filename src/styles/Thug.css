@@ -1,0 +1,37 @@
+/* Thug.css - styles specific to the Young Thug collection page */
+.thug-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 400px 40px;
+  color: #fff;
+}
+
+.thug-hero {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.thug-card {
+  max-width: 1100px;
+  width: auto;
+  margin: 0 auto;
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.38);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.thug-card img, .thug-card video {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.thug-article { text-align: center; max-width: 900px; margin: 18px auto; }
+
+@media (max-width: 900px) {
+  .thug-card { padding: 14px; }
+}

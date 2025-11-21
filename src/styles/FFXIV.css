@@ -1,0 +1,180 @@
+.ffxiv-page {
+  /* center the article content horizontally and keep spacing below nav */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 344px 3px;
+  color: #fff;
+  background: linear-gradient(180deg, #07070a 0%, #0b0b12 60%);
+  min-height: 100vh;
+}
+
+.ffxiv-topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 10px 0 22px;
+}
+.ffxiv-topbar a { color: #ffd166; text-decoration:none; font-weight:600; }
+.topbar-center { color: #f6f4f2; font-weight:700; }
+
+.ffxiv-header { text-align: center; margin-bottom: 18px; }
+.ffxiv-header h1 { font-family: 'Playfair Display', serif; font-size: 48px; margin-bottom: 6px; letter-spacing: 1px; color: #fff; }
+.ffxiv-sub { color: #d0cfcf; margin-top: 6px; }
+
+.ffxiv-hero { display:flex; justify-content:center; margin: 30px 0; }
+
+/* Estilos para interacciones dentro de la vista de publicación */
+.btn-like {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #e74c3c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn-like[aria-pressed="true"] { background: rgba(231, 76, 60, 0.08); color: #c0392b; }
+
+/* Comentarios: input y error */
+.comment-input { width: 100%; min-height: 72px; max-height: 220px; }
+.comment-error { color: #ff6b6b; font-size: 13px; margin-top: 6px; }
+
+/* Estilos modernos para la lista de comentarios */
+.comment-item { display:flex; gap:12px; padding:10px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); margin-bottom:8px; align-items:flex-start; }
+.comment-avatar { width:40px; height:40px; border-radius:50%; background:#222; color:#ffd166; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; }
+.comment-body { flex:1; }
+.comment-meta { display:flex; gap:8px; align-items:center; }
+.comment-user { color:#fff; font-weight:700; font-size:14px; }
+.comment-date { color:#999; font-size:12px; }
+.comment-text { color:#eaeaea; margin-top:6px; line-height:1.4; }
+
+.comment-form-wrap { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.comment-input-wrap { display:block; }
+.comment-actions-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+/* Ajustes responsivos */
+@media (max-width: 900px) {
+  .ffxiv-page { padding: 60px 24px 24px; }
+  .ffxiv-card { max-width: 100%; }
+}
+
+/* White card container that mimics the LV article look */
+.ffxiv-card {
+  /* tarjeta principal que contiene media + contenido */
+  /* Usar fondo translúcido para mantener tema oscuro y evitar bloques blancos */
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding: 18px;
+  border-radius: 12px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  flex-direction: column;
+}
+.ffxiv-media {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ffxiv-card img, .ffxiv-card video { display: block; width: 100%; border-radius: 6px; object-fit: cover; background: #f6f6f6; }
+.ffxiv-card video { margin-top: 12px; }
+
+/* metadatos y encabezado dentro de la tarjeta */
+.ffxiv-meta { margin-top: 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.ffxiv-meta .meta-left { flex:1; }
+.ffxiv-meta .meta-right { flex:0 0 auto; text-align:right; color:#777; }
+.ffxiv-title { font-size: 22px; margin: 0 0 6px; font-family: 'Playfair Display', serif; }
+.ffxiv-subtle { color:#777; font-size:13px; }
+
+.ffxiv-content { display: grid; grid-template-columns: 1fr 320px; gap: 28px; margin-top: 22px; }
+.ffxiv-article { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); }
+.ffxiv-article h2 { color: #ffd166; margin-bottom: 10px; }
+.ffxiv-article p { color: #e6e6e6; line-height: 1.6; }
+
+.ffxiv-gallery { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+.ffxiv-thumb { background: rgba(255,255,255,0.02); padding:6px; border-radius:8px; text-align:center; }
+.ffxiv-thumb img { width:100%; height:140px; object-fit:cover; border-radius:6px; display:block; }
+.ffxiv-thumb figcaption { font-size:12px; color:#cfcfcf; margin-top:6px; }
+.ffxiv-thumb { cursor: pointer; }
+.ffxiv-thumb img { transition: transform 180ms ease, box-shadow 180ms ease; }
+.ffxiv-thumb:hover img { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+.ffxiv-thumb.active img { outline: 3px solid rgba(255,209,102,0.18); transform: translateY(-2px) scale(1.02); }
+
+.ffxiv-collections { background: transparent; color: #d0d0d0; }
+.ffxiv-collections h3 { margin-bottom: 8px; }
+.ffxiv-collections ul { list-style: none; padding: 0; }
+.ffxiv-collections li { padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.03); }
+.ffxiv-note { margin-top: 12px; background: rgba(255,209,102,0.04); padding: 10px; border-radius:6px; color:#ffeecf; }
+
+/* Contact page specific tweaks: make the contact card readable and balanced */
+.contact-card {
+  /* Ajuste: tarjeta de contacto con tema oscuro para mantener consistencia */
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: #fff;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 28px 30px;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.contact-card h2, .contact-card h3 { color: #ffd166; }
+.contact-card p { color: #e6e6e6; }
+.contact-card .contact-form label { display:block; margin-top:12px; color:#cfcfcf; font-size:13px; }
+.contact-card .contact-form input,
+.contact-card .contact-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.18);
+  color: #fff;
+}
+.contact-card .contact-form textarea { min-height: 120px; resize: vertical; }
+.contact-card .btn-primary { background:#e74c3c; color:#fff; border:none; padding:10px 14px; border-radius:8px; }
+.contact-card .btn-primary:hover { filter:brightness(0.95); }
+
+/* Form helper styles */
+.contact-card .form-row { margin-bottom: 6px; }
+.contact-card .form-error { color: #b00020; font-size: 13px; margin-top: 6px; }
+.contact-card .success-message { background: #e6ffed; color: #064e2e; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(6,78,46,0.08); }
+
+@media (max-width: 900px) {
+  .contact-card { padding: 18px; margin: 0 16px; }
+}
+
+@media (max-width: 900px) {
+  .ffxiv-content { grid-template-columns: 1fr; }
+  .ffxiv-hero img { max-width: 100%; }
+  .ffxiv-gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Collections two-column layout: main list + right image */
+.colecciones-container {
+  display: flex;
+  gap: 36px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+.colecciones-main { flex: 1 1 620px; }
+.colecciones-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.colecciones-side { flex: 0 0 420px; display: block; }
+.colecciones-side img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
+
+@media (max-width: 980px) {
+  .colecciones-container { gap: 20px; }
+  .colecciones-side { display: none; }
+  .colecciones-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .ffxiv-gallery { grid-template-columns: 1fr; }
+  .ffxiv-thumb img { height: 180px; }
+}

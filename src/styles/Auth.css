@@ -1,0 +1,352 @@
+/* src/styles/Auth.css - Cleaned and themed for Asfalto Fashion */
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+
+.contenedorAsfalto {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow-y: auto; /* permitir scroll vertical */
+}
+
+.ladoImagen {
+  flex: 0.6;
+  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/IMG/fondothug.jpg') center/cover no-repeat;
+}
+
+.ladoFormulario {
+  flex: 0.4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  gap: 18px;
+  background: #000;
+}
+
+.topContent { width: 100%; max-width: 380px; text-align: center; margin-bottom: 18px; }
+.logoPrincipal { height: 44px; display:block; margin: 0 auto 12px; }
+.editorialTexto p { color: #bfbfbf; font-size: 14px; margin: 6px 0; line-height: 1.5; }
+
+form {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  background: rgba(255,255,255,0.02);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,209,102,0.04);
+}
+
+/* Prevent layout jump: reserve a stable area for form fields and messages */
+.form-body {
+    width: 100%;
+    min-height: 360px; /* enough space for inputs + optional admin token field and messages */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-message {
+    min-height: 22px; /* reserve space for error/success text */
+    transition: opacity 160ms ease, color 160ms ease;
+}
+
+h2 { margin: 0 0 6px; font-family: 'Playfair Display', serif; font-size: 28px; color: #f8f6f3; letter-spacing: 1.5px; font-weight: 700; text-align:center; }
+
+.field { display:block; width:100%; }
+.field input { width:100%; padding: 12px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:#fff; }
+.field .field-error { margin-top:8px; color:#ff6b6b; font-size:13px; }
+
+.password-field { position: relative; }
+.password-field input { padding-right: 46px; }
+
+.btn-primary { width:100%; padding:12px 14px; border-radius:10px; background:transparent; color:#ffd166; border:1px solid rgba(255,209,102,0.18); font-weight:700; cursor:pointer; }
+.btn-primary:hover { background:#ffd166; color:#081c15; }
+
+.link { text-align:center; color:#bfbfbf; font-size:14px; }
+.link a { color:#ffd166; font-weight:700; text-decoration:none; cursor:pointer; }
+
+.marca { margin-top: 14px; color:#888; font-family:'Georgia', serif; font-size:13px; }
+
+@media (max-width: 900px) {
+  .contenedorAsfalto { flex-direction: column; }
+  .ladoImagen { flex: 0 0 220px; min-height: 200px; }
+  .ladoFormulario { flex: 1; padding: 22px; }
+  form { max-width: 100%; }
+}
+/* src/styles/Auth.css */
+
+/* === RESET Y FUENTES === */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
+.contenedorAsfalto {
+    display: flex;
+    /* preferir min-height para que el contenedor pueda crecer con el contenido
+       y no recortar elementos cuando se hace zoom */
+    min-height: 100vh;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: #000;
+    color: #fff;
+    overflow-y: auto; /* permitir scroll vertical en dispositivos pequeños/zoom */
+}
+
+/* === LADO IMAGEN (IZQUIERDA) === */
+.ladoImagen {
+    position: relative;
+    flex: 0.6;
+    /* Asegúrate de que /IMG/fondothug.jpg exista en public/IMG */
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('/IMG/fondothug.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: darken; /* Oscurece la imagen para contraste */
+    overflow: hidden;
+}
+
+/* === LADO FORMULARIO (DERECHA - CONTENEDOR PRINCIPAL) === */
+.ladoFormulario {
+    flex: 0.4;
+    background: #000; /* Fondo negro puro */
+    display: flex;
+    flex-direction: column;
+    /* Alinea el contenido al inicio (arriba) */
+    justify-content: flex-start;
+    align-items: center;
+    padding: 40px;
+    padding-top: 60px; /* Espacio extra arriba */
+    color: #fff;
+}
+
+/* === CONTENIDO SUPERIOR (LOGO Y TEXTO EDITORIAL) === */
+.topContent {
+    width: 100%;
+    max-width: 300px;
+    text-align: left;
+    margin-bottom: 40px; /* Separa el texto editorial del título "Iniciar Sesión" */
+}
+
+/* 1. Título/Logo en la Esquina Superior del Panel Negro */
+.logoPrincipal {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* 2. Bloque de Texto Editorial */
+.editorialTexto p {
+    font-size: 14px;
+    margin: 4px 0;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+/* === FORMULARIO (H2 Y CAMPOS) === */
+form {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    /* Alinea los elementos del formulario a la izquierda (como en la captura) */
+    align-items: flex-start;
+}
+
+/* Título "Iniciar Sesión" */
+h2 {
+    text-align: left;
+    width: 100%;
+    margin-bottom: 25px;
+    color: #f2f2f2;
+    font-size: 28px;
+    font-family: 'Georgia', serif;
+    letter-spacing: 1px;
+    font-weight: 400; /* Ligeramente más ligero, estilo editorial */
+}
+
+/* Contenedor para etiquetas y campos */
+.field-label {
+    display: block;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+/* CAMPOS DE TEXTO */
+input {
+    width: 100%;
+    padding: 10px 0; /* Ajustado para línea discreta */
+    border: none;
+    border-bottom: 1px solid #444; /* Línea inferior sutil */
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    transition: border-bottom-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-bottom-color: #eee; /* Línea más visible al enfocar */
+}
+
+/* PASSWORD FIELD & EYE */
+
+.password-field {
+    position: relative;
+    display: block;
+    width: 100%; /* Asegura que la label ocupe todo el ancho */
+}
+
+.password-inner { position: relative; width: 100%; }
+.password-field input, .password-inner input {
+    padding-right: 86px; /* espacio para el botón ojo */
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 8px; /* margen desde el borde del input */
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #fff;
+    cursor: pointer;
+    min-width: 64px;
+    height: auto;
+    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.eye-toggle svg { display: block; width: 18px; height: 18px; }
+.eye-toggle svg path, .eye-toggle svg circle { stroke: currentColor; fill: none; stroke-width: 1.4; }
+.eye-toggle { color: #fff; }
+.eye-toggle:hover { color: #ffd166; background: rgba(255,209,102,0.06); border-color: rgba(255,209,102,0.12); }
+
+/* ensure the button doesn't create an outline when focused */
+.eye-toggle:focus { outline: none; box-shadow: 0 0 0 3px rgba(100,108,255,0.12); }
+
+/* Ocultar el botón nativo de mostrar contraseña en algunos navegadores
+   (Edge/IE/Chromium) para evitar que aparezca un segundo icono). */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+input[type="password"]::-webkit-password-reveal-button,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+    display: none !important;
+}
+
+/* ERRORES y ÉXITO */
+.field-error {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin-top: 6px;
+}
+.field-success {
+    color: #8ce99a;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* BOTÓN "Ingresar" */
+.btn-primary {
+    width: 100%;
+    padding: 14px 12px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+    margin-top: 30px; /* Espacio antes del botón */
+}
+.btn-primary:active { transform: scale(0.97); background: #ccc; }
+.btn-primary:hover:not(:disabled) { background: #ddd; }
+.btn-primary:disabled { background: #333; color: #999; cursor: not-allowed; }
+
+/* ENLACES Y FOOTER */
+.link {
+    text-align: center;
+    width: 100%;
+    font-size: 14px;
+    margin-top: 10px;
+    color: #999; /* Color gris suave */
+}
+.link a {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* MARCA al pie del formulario */
+.marca {
+    margin-top: auto; /* Empuja el footer al fondo del contenedor flex */
+    padding-bottom: 20px;
+    font-size: 13px;
+    font-family: 'Georgia', serif;
+    color: #888;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* === MEDIA QUERIES (RESPONSIVE) === */
+@media (max-width: 900px) {
+    .contenedorAsfalto {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .ladoImagen {
+        flex: 0.3;
+        min-height: 200px;
+    }
+
+    .ladoFormulario {
+        flex: 1;
+        min-height: auto;
+        padding: 30px 20px;
+        padding-top: 30px; /* Reducir espacio superior en móvil */
+    }
+
+    .topContent {
+        margin-bottom: 25px;
+    }
+
+    .marca {
+        margin-top: 25px;
+        padding-bottom: 0;
+    }
+}

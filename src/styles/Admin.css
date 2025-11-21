@@ -1,0 +1,16 @@
+/* Estilos básicos para el panel administrativo */
+.admin-page { background: #0f0f10; min-height: 100vh; color: #fff; }
+.admin-main { max-width: 1100px; margin: 48px auto; padding: 24px; }
+.admin-intro { color: #dcdcdc; margin-bottom: 18px; }
+.admin-section { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 14px; margin-bottom: 18px; }
+.admin-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.admin-item { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.2); }
+.admin-thumb { width: 88px; height: 64px; object-fit: cover; border-radius: 6px; }
+.admin-item-body { flex: 1; }
+.admin-meta { color: #bbb; font-size: 13px; margin-top: 4px; }
+.admin-actions { display: flex; gap: 8px; }
+.btn-danger { background: #b33; color: #fff; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.chat-log { max-height: 220px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.15); border-radius: 6px; }
+.chat-log-line { display:flex; gap:8px; padding:6px 4px; border-bottom:1px solid rgba(255,255,255,0.02); }
+.chat-log-from { font-weight:700; color:#ffd166; }
+.chat-log-text { color:#fff; }

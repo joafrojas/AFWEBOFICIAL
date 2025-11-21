@@ -1,0 +1,52 @@
+/* src/styles/Post.css - Estilos específicos para la vista de detalle de publicaciones */
+
+/* Fade-in suave para la media principal */
+.post-media-fade {
+  opacity: 0;
+  transform: translateY(6px) scale(0.995);
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+.post-media-fade.loaded {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Caption bajo la imagen */
+.post-caption {
+  margin-top: 10px;
+  color: #8f8f8f;
+  font-size: 13px;
+  text-align: left;
+}
+
+/* Botón like más limpio dentro del artículo */
+.article-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.02);
+  color: #ff6b6b;
+  cursor: pointer;
+  font-weight: 700;
+}
+.article-like:hover { filter: brightness(1.03); }
+.article-like span.count { color: #fff; font-weight: 700; }
+
+/* Mejora visual general del bloque de comentarios (ajuste fino) */
+.comment-item { padding: 12px; border-radius: 10px; margin-bottom: 10px; }
+.comment-avatar { width:44px; height:44px; font-size:16px; }
+.comment-meta { gap:10px; }
+.comment-user { font-size:14px; }
+.comment-text { font-size:15px; color:#e8e8e8; }
+
+/* Acción de formulario compacta */
+.comment-actions-row { gap:12px; }
+
+/* Pequeños ajustes para mobile */
+@media (max-width: 900px) {
+  .post-caption { font-size: 12px; }
+  .article-like { padding: 6px 10px; }
+}

@@ -1,0 +1,280 @@
+/* src/styles/Gallery.css - DISEÑO FINAL ASFALTO FASHION (ESPACIO, CENTRADO Y LUJO) */
+
+/* === RESET Y BASE === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Fondo negro, texto blanco */
+    font-family: 'Inter', sans-serif;
+    background-color: #000;
+    color: #fff;
+    line-height: 1.6;
+}
+
+/* Contenedor principal de la galería */
+.galeria-page {
+    /*Padding superior amplio para la NavBar y 80px a los lados para 'huecos' */
+    padding: 110px 80px 80px; 
+    max-width: 1500px; /* Límite de ancho para el contenido centrado */
+    margin: 0 auto; /* CENTRADO DEL CONTENIDO */
+    background-color: #000; 
+    min-height: 100vh;
+}
+.editorial-post { 
+    opacity: 0; 
+    transform: translateY(12px); 
+    transition: opacity 500ms ease, transform 500ms ease;
+}
+.editorial-post.show { opacity: 1; transform: translateY(0); }
+
+
+/* === 1. BARRA DE NAVEGACIÓN CENTRADA === */
+.main-nav-container {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.98);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    height: 70px;
+}
+.navbarAsfalto {
+    display: flex; 
+    padding: 15px 80px;
+    height: 100%;
+    align-items: center;
+    position: relative;
+    max-width: 1500px;
+    margin: 0 auto; /* Centra la barra de navegación */
+}
+/* Logo PNG Centrado */
+.logoNav {
+    position: absolute; left: 50%; transform: translateX(-50%); height: 35px; display: flex; align-items: center; z-index: 1; 
+}
+.nav-logo-img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5)); transition: transform 0.3s ease; }
+.nav-logo-img:hover { transform: scale(1.05); }
+
+/* Menús */
+.menuNav { list-style: none; display: flex; gap: 30px; align-items: center; margin: 0; padding: 0; flex-grow: 1; }
+.menuNav-left { justify-content: flex-start; }
+.menuNav-right { justify-content: flex-end; }
+.menuNav li a {
+    text-decoration: none; color: #a0a0a0; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.menuNav li a:hover { color: #fff; }
+
+.logout-btn { background: #e74c3c; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 700; transition: background 0.3s ease; }
+
+
+/* === 2. HEADER Y TÍTULOS === */
+.galeria-header { padding: 0; }
+.galeria-header h1 {
+    font-family: 'Playfair Display', serif; font-size: 56px; letter-spacing: 3px; margin-bottom: 10px; color: #fff; font-weight: 900; text-align: center; text-transform: uppercase;
+}
+.galeria-sub { font-size: 20px; color: #a0a0a0; margin-bottom: 30px; text-align: center; }
+
+/* 💡 ESTILOS PARA LOS FILTROS PEGADIZOS (STICKY) */
+.filters-sticky {
+    position: sticky;
+    top: 70px; /* Justo debajo de la navbar */
+    z-index: 9;
+    background: transparent; /* dejar transparente para que no se vea como marco al pegarse */
+    padding: 10px 80px; /* mantener gutters iguales a .galeria-page */
+    margin-bottom: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    
+}
+
+/* Info section (tipo de moda / noticias) */
+.info-section { max-width: 1200px; margin: 0 auto 14px; padding: 0 80px; }
+.info-item { background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); display:flex; align-items:center; gap:16px; justify-content:center; }
+.info-link { display:block; flex:0 0 auto; }
+.info-image { width: 220px; height: 132px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.04); display:block; }
+.info-body { max-width: 820px; text-align: center; }
+.info-item strong { color: #fff; display:block; margin-bottom:6px; }
+.info-text { color: #bdbdbd; margin: 0; }
+.info-text a { color: #fff; text-decoration: underline; }
+
+.filter-chips {
+    display: flex;
+    gap: 15px;
+    justify-content: center; /* centra los chips dentro del contenedor interno */
+    /* limitar el ancho interno al ancho de contenido real (max-width página - 2*gutter) */
+    max-width: 1340px; /* 1500 - 80*2 */
+    margin: 0 auto;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+/* Visual separation: chips are pills, give slight shadow so sticky doesn't look like a frame */
+.chip { background: rgba(255,255,255,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+.chip.active { background: #fff; color: #000; box-shadow: 0 8px 26px rgba(0,0,0,0.7); }
+.chip {
+    padding: 8px 12px; font-size: 13px; letter-spacing: 0.5px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px;
+    color: #fff; cursor: pointer; transition: background 0.3s ease;
+}
+.chip.active { background: #fff; color: #000; font-weight:700; }
+
+
+/* === 3. CARRUSEL HERO === */
+.editorial-hero { margin: 30px auto 30px; padding: 0; max-width: 100%; }
+.editorial-hero img, .editorial-hero video { border-radius: 12px; height: 600px; object-fit: cover; }
+.editorial-separator { border: none; height: 1px; background: rgba(255, 255, 255, 0.15); margin: 60px auto; max-width: 900px; }
+
+
+
+.masonry-grid {
+    column-gap: 32px; 
+    column-count: 4; 
+    padding: 0; /* No padding interno, usamos el del .galeria-page */
+    max-width: 100%; 
+    margin: 0 auto 80px;
+}
+
+.masonry-item {
+    margin: 0 0 32px; 
+    break-inside: avoid;
+    background: #0d0d0d;
+    border-radius: 8px; 
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); 
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Hover */
+.masonry-item:hover {
+    transform: translateY(-8px); 
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); 
+    z-index: 6;
+}
+
+.masonry-item img, .masonry-item video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0; 
+}
+
+/* Bloque de Metadatos (Siempre visible y elegante) */
+.masonry-meta-block { 
+    padding: 15px 20px; 
+    background: #000; 
+    color: #fff;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.masonry-meta-title { font-family: 'Georgia', serif; font-size: 18px; margin: 0; color: #fff; line-height: 1.3; }
+.masonry-meta-category { color: #a0a0a0; font-size: 12px; margin-bottom: 5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+.masonry-meta-author { color: #666; font-size: 13px; margin-top: 10px; }
+
+
+/* --- Media Queries (Responsive) --- */
+@media (max-width: 1400px) {
+    .masonry-grid { column-count: 3; column-gap: 28px; }
+}
+@media (max-width: 1000px) {
+    .masonry-grid { column-count: 2; column-gap: 20px; }
+    .galeria-header h1 { font-size: 50px; }
+    .galeria-page { padding: 90px 40px 40px; }
+    .navbarAsfalto { padding: 15px 40px; }
+    /* ajustar gutters del filtro para que coincidan con .galeria-page */
+    .filters-sticky { padding: 10px 40px; }
+    .filter-chips { max-width: calc(100% - 80px); }
+}
+@media (max-width: 600px) {
+    .masonry-grid { column-count: 1; padding: 0; }
+    
+    .galeria-page { padding: 90px 20px 40px; }
+    .navbarAsfalto { padding: 15px 20px; }
+    .galeria-header h1 { font-size: 40px; }
+    .filters-sticky { padding: 10px 20px; }
+    .filter-chips { max-width: calc(100% - 40px); }
+    .info-item { flex-direction: column; align-items: center; }
+    .info-image { width: 100%; height: auto; max-height: 220px; }
+    .info-body { text-align: center; }
+}
+
+/* === BOTÓN FLOTANTE Y MODAL DE SUBIDA === */
+.floating-upload-btn {
+    position: fixed;
+    right: 30px;
+    bottom: 36px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    /* dark, elegant button that matches the site's black/gold aesthetic */
+    background: linear-gradient(180deg,#0f0f0f 0%, #1a1a1a 100%);
+    color: #ffd166; /* gold plus sign */
+    font-size: 36px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,209,102,0.06);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.65), 0 4px 12px rgba(255,209,102,0.03) inset;
+    cursor: pointer;
+    z-index: 60;
+}
+.floating-upload-btn:active { transform: translateY(1px); }
+
+.upload-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 70;
+}
+.upload-modal-card {
+    width: 480px;
+    max-width: calc(100% - 40px);
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+    color: #fff;
+}
+.upload-modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.upload-close { background:transparent; border:none; color:#fff; font-size:20px; cursor:pointer; }
+.upload-form label { display:block; margin-top:10px; color:#bbb; font-size:13px; }
+.upload-form input, .upload-form select { width:100%; padding:10px 12px; margin-top:6px; background:#070707; border:1px solid rgba(255,255,255,0.06); color:#fff; border-radius:6px; }
+.upload-author { margin-top:10px; color:#999; font-size:13px; }
+.upload-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px; }
+.btn-secondary { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:6px; cursor:pointer; }
+.btn-primary { background:#e74c3c; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
+
+/* Botón de like usado en las tarjetas */
+.btn-like {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #ffd166;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+.btn-like[aria-pressed="true"] { background: rgba(255,209,102,0.12); color: #ff6b6b; border-color: rgba(255,209,102,0.2); }
+
+@media (max-width: 480px) {
+    .floating-upload-btn { right: 18px; bottom: 20px; width:56px; height:56px; font-size:30px; }
+    .upload-modal-card { width: 92%; }
+}
+
+/* Preview dentro del modal */
+.upload-preview { display:block; width:100%; max-height:320px; object-fit:cover; margin-top:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); }
+
+/* Inline error inside modal */
+.upload-error { background: rgba(231, 76, 60, 0.08); color: #ffb3b0; border: 1px solid rgba(231,76,60,0.18); padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; }
+.upload-filename { color: #bbb; font-size: 13px; margin-top:6px; }
+
+/* Override default link color for the main gallery page (avoid bright blue) */
+.galeria-page a { color: #ffd166; text-decoration: none; }
+.galeria-page a:hover { color: #ffe8a8; text-decoration: underline; }

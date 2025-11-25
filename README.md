@@ -30,24 +30,19 @@ export default defineConfig([
       // Optionally, add this for stylistic rules
       tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        # AsfaltoFashion — aplicación demo
+
+powershell
+npm run setup
+npm run dev
 
 
-        - Cómo arrancar rápido (PowerShell):
+powershell
+npm test
 
-        ```powershell
-        npm run setup
-        npm run dev
-        ```
-
-        ```powershell
-        npm test
-        ```
+cd AFWEB
+npm install
+npm run dev
+npm install --save-dev @testing-library/react@latest
 
 
 

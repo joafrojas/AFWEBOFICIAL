@@ -14,3 +14,51 @@
 .chat-log-line { display:flex; gap:8px; padding:6px 4px; border-bottom:1px solid rgba(255,255,255,0.02); }
 .chat-log-from { font-weight:700; color:#ffd166; }
 .chat-log-text { color:#fff; }
+
+/* Mejorar contraste de botones usados en NavBar / Panel Admin */
+.btn-admin {
+	background: #198754; /* verde accesible */
+	color: #ffffff;
+	border: 1px solid rgba(0,0,0,0.15);
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+	box-shadow: 0 1px 0 rgba(0,0,0,0.2) inset;
+}
+.btn-admin:hover {
+	background: #157347;
+}
+.logout-btn {
+	background: #ff6b3d; /* naranja para distinguir */
+	color: #ffffff;
+	border: 1px solid rgba(0,0,0,0.12);
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+.logout-btn:hover {
+	background: #e55a2b;
+}
+
+/* pequeño badge para etiqueta ADMIN dentro del panel */
+.admin-badge {
+	display:inline-block;
+	background:#0fa87a;
+	color:#fff;
+	padding:4px 8px;
+	border-radius:6px;
+	font-weight:700;
+	font-size:12px;
+}
+
+/* Botón secundario y variantes de badge */
+.btn-secondary {
+	background: #6c757d;
+	color: #fff;
+	border: 1px solid rgba(0,0,0,0.08);
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+.btn-secondary:hover { background: #5a6368; }
+.badge-muted { background: #6c757d; }

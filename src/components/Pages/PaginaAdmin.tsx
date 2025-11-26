@@ -271,7 +271,7 @@ const PaginaAdmin: React.FC = () => {
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 14 }}><strong>{user.nombre || user.nombre_usu || user.username}</strong></div>
             <div style={{ marginTop: 6 }}>
-              <span style={{ padding: '6px 10px', background: isAdmin ? '#198754' : '#6c757d', color: '#fff', borderRadius: 6 }}>{isAdmin ? 'ADMIN' : 'NO ADMIN'}</span>
+              <span className={isAdmin ? 'admin-badge' : 'admin-badge badge-muted'}>{isAdmin ? 'ADMIN' : 'NO ADMIN'}</span>
             </div>
           </div>
         </div>
@@ -286,10 +286,10 @@ const PaginaAdmin: React.FC = () => {
         {isAdmin && (
           <>
             <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
-              <button onClick={loadUsers} disabled={loadingUsers}>{loadingUsers ? 'Cargando usuarios...' : 'Cargar usuarios'}</button>
-              <button onClick={loadPosts} disabled={loadingPosts}>{loadingPosts ? 'Cargando posts...' : 'Cargar posts'}</button>
-              <button onClick={() => { setMessage(null); setUsers([]); setPosts([]); }}>Limpiar</button>
-              <button onClick={checkServices} style={{ marginLeft: 8 }}>Verificar servicios</button>
+              <button className="btn-admin" onClick={loadUsers} disabled={loadingUsers}>{loadingUsers ? 'Cargando usuarios...' : 'Cargar usuarios'}</button>
+              <button className="btn-admin" onClick={loadPosts} disabled={loadingPosts}>{loadingPosts ? 'Cargando posts...' : 'Cargar posts'}</button>
+              <button className="btn-secondary" onClick={() => { setMessage(null); setUsers([]); setPosts([]); }}>Limpiar</button>
+              <button className="btn-admin" onClick={checkServices} style={{ marginLeft: 8 }}>Verificar servicios</button>
             </div>
 
             {Object.keys(serviceStatus).length > 0 && (
@@ -308,7 +308,7 @@ const PaginaAdmin: React.FC = () => {
                     <li key={(u.id || u.userId || u.user_id || u.nombre_usu || u.correo)} style={{ display: 'flex', justifyContent: 'space-between', padding: 8, borderBottom: '1px solid #eee' }}>
                       <div>
                         <div><strong>{u.nombre || u.nombre_usu || u.username}</strong></div>
-                        <div style={{ fontSize: 12, color: '#666' }}>{u.correo}</div>
+                        <div style={{ fontSize: 12, color: '#fa8b8bff' }}>{u.correo}</div>
                       </div>
                       <div>
                           {/**
@@ -319,6 +319,7 @@ const PaginaAdmin: React.FC = () => {
                             return (
                               <>
                                 <button
+                                  className="btn-secondary"
                                   onClick={() => handleToggleAdmin(u)}
                                   style={{ marginLeft: 8 }}
                                 >
@@ -327,7 +328,7 @@ const PaginaAdmin: React.FC = () => {
                               </>
                             );
                           })()}
-                          <button onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>Eliminar</button>
+                          <button className="btn-danger" onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>Eliminar</button>
                       </div>
                     </li>
                   ))}
@@ -338,7 +339,7 @@ const PaginaAdmin: React.FC = () => {
             <section style={{ marginTop: 20 }}>
               <h2>Contactos</h2>
               <div style={{ marginBottom: 8 }}>
-                <button onClick={loadContacts} disabled={loadingContacts}>{loadingContacts ? 'Cargando contactos...' : 'Cargar contactos'}</button>
+                <button className="btn-admin" onClick={loadContacts} disabled={loadingContacts}>{loadingContacts ? 'Cargando contactos...' : 'Cargar contactos'}</button>
               </div>
               {contacts.length === 0 ? <p>No hay solicitudes de contacto cargadas.</p> : (
                 <ul>
@@ -349,7 +350,7 @@ const PaginaAdmin: React.FC = () => {
                         <div style={{ fontSize: 12, color: '#333' }}>{c.mensaje}</div>
                       </div>
                       <div>
-                        <button onClick={() => handleDeleteContact(c)}>Eliminar</button>
+                        <button className="btn-danger" onClick={() => handleDeleteContact(c)}>Eliminar</button>
                       </div>
                     </li>
                   ))}
@@ -365,10 +366,10 @@ const PaginaAdmin: React.FC = () => {
                     <li key={(p.externalId || p.id)} style={{ display: 'flex', justifyContent: 'space-between', padding: 8, borderBottom: '1px solid #eee' }}>
                       <div>
                         <div><strong>{p.title || p.titleText || p.id}</strong></div>
-                        <div style={{ fontSize: 12, color: '#666' }}>{p.authorId || p.author || '—'}</div>
+                        <div style={{ fontSize: 12, color: '#cac9c9ff' }}>{p.authorId || p.author || '—'}</div>
                       </div>
                       <div>
-                        <button onClick={() => handleDeletePost(p)}>Eliminar</button>
+                        <button className="btn-danger" onClick={() => handleDeletePost(p)}>Eliminar</button>
                       </div>
                     </li>
                   ))}

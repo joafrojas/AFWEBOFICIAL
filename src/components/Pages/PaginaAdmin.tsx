@@ -33,12 +33,14 @@ const PaginaAdmin: React.FC = () => {
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [loadingContacts, setLoadingContacts] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [serviceStatus, setServiceStatus] = useState<Record<string,string>>({});
 
   useEffect(() => {
     const u = getLocalCurrentUser();
     setUser(u);
     const adminFlag = !!(u && (u.isAdmin === true || (u.correo && String(u.correo).endsWith(ADMIN_EMAIL_DOMAIN))));
     setIsAdmin(adminFlag);
+    // No precargamos datos locales: el panel debe usar exclusivamente los microservicios.
   }, []);
 
   // Cargar usuarios desde el microservicio `usuarios`
@@ -46,12 +48,15 @@ const PaginaAdmin: React.FC = () => {
     setLoadingUsers(true);
     setMessage(null);
     try {
-      const res = await fetch('http://localhost:8081/users');
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string,string> = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/users', { headers });
       if (!res.ok) throw new Error(`users ${res.status}`);
       const body = await res.json();
       setUsers(Array.isArray(body) ? body : []);
     } catch (e: any) {
-      setMessage('No se pudieron cargar usuarios: ' + (e?.message || e));
+      setMessage('No se pudieron cargar usuarios desde el servicio: ' + (e?.message || e));
       setUsers([]);
     } finally {
       setLoadingUsers(false);
@@ -63,12 +68,12 @@ const PaginaAdmin: React.FC = () => {
     setLoadingContacts(true);
     setMessage(null);
     try {
-      const res = await fetch('http://localhost:8080/contacto/listar');
+      const res = await fetch('/contacto/listar');
       if (!res.ok) throw new Error(`contacts ${res.status}`);
       const body = await res.json();
       setContacts(Array.isArray(body) ? body : []);
     } catch (e: any) {
-      setMessage('No se pudieron cargar las solicitudes de contacto: ' + (e?.message || e));
+      setMessage('No se pudieron cargar las solicitudes de contacto desde el servicio: ' + (e?.message || e));
       setContacts([]);
     } finally {
       setLoadingContacts(false);
@@ -80,16 +85,49 @@ const PaginaAdmin: React.FC = () => {
     setLoadingPosts(true);
     setMessage(null);
     try {
-      const res = await fetch('http://localhost:8082/api/posts');
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string,string> = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/posts', { headers });
       if (!res.ok) throw new Error(`posts ${res.status}`);
       const body = await res.json();
       setPosts(Array.isArray(body) ? body : []);
     } catch (e: any) {
-      setMessage('No se pudieron cargar publicaciones: ' + (e?.message || e));
+      setMessage('No se pudieron cargar publicaciones desde el servicio: ' + (e?.message || e));
       setPosts([]);
     } finally {
       setLoadingPosts(false);
     }
+  };
+
+  // Verificar conectividad con los microservicios (útil para depurar CORS / availability)
+  const checkServices = async () => {
+    setMessage(null);
+    const endpoints: { key: string; url: string }[] = [
+      { key: 'usuarios', url: '/users' },
+      { key: 'contacto', url: '/contacto/listar' },
+      { key: 'foro', url: '/api/posts' },
+    ];
+    const next: Record<string,string> = {};
+    await Promise.all(endpoints.map(async (ep) => {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+        const token = localStorage.getItem('authToken');
+        const headers: Record<string,string> = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const res = await fetch(ep.url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timer);
+        next[ep.key] = res.ok ? `OK (${res.status})` : `ERROR (${res.status})`;
+      } catch (err: any) {
+        console.error('[PaginaAdmin] checkServices ', ep.url, err);
+        next[ep.key] = (err?.name === 'AbortError') ? 'Timeout' : String(err?.message || err);
+      }
+    }));
+    setServiceStatus(next);
+    const down = Object.entries(next).filter(([,v]) => !v.startsWith('OK'));
+    if (down.length > 0) setMessage('Algunos servicios no están disponibles. Revisa la consola o CORS en los microservicios.');
+    else setMessage('Todos los servicios responden correctamente.');
   };
 
   const handleDeleteUser = async (u: User) => {
@@ -97,28 +135,84 @@ const PaginaAdmin: React.FC = () => {
     const ok = window.confirm(`Eliminar usuario ${u.nombre || u.nombre_usu || u.username}? Esta acción es irreversible.`);
     if (!ok) return;
     try {
-      const id = u.id || u.userId || u.user_id;
-      const res = await fetch(`http://localhost:8081/users/${id}`, { method: 'DELETE', headers: { 'X-ADMIN-TOKEN': ADMIN_TOKEN } });
+      const id = u.id || u.userId || u.user_id || u.nombre_usu || u.correo;
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string,string> = { 'X-ADMIN-TOKEN': ADMIN_TOKEN };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      // Intentar borrar en el microservicio (proxy via /users)
+      const res = await fetch(`/users/${id}`, { method: 'DELETE', headers });
       if (!res.ok) throw new Error(String(res.status));
-      // actualizar lista local
-      setUsers(prev => prev.filter(x => (x.id || x.userId || x.user_id) !== id));
+      // actualizar lista solo tras éxito remoto
+      setUsers(prev => prev.filter(x => (x.id || x.userId || x.user_id || x.nombre_usu || x.correo) !== id));
       setMessage('Usuario eliminado en el servicio de usuarios.');
     } catch (e: any) {
-      setMessage('Error borrando usuario: ' + (e?.message || e));
+      console.error('[PaginaAdmin] handleDeleteUser error', e);
+      setMessage('Error borrando usuario en el servicio: ' + (e?.message || e));
     }
   };
 
   const handleToggleAdmin = async (u: User) => {
     if (!isAdmin) { alert('Solo administradores pueden cambiar roles.'); return; }
     try {
-      const id = u.id || u.userId || u.user_id;
+      const id = u.id || u.userId || u.user_id || u.nombre_usu || u.correo;
       const nextValue = !Boolean(u.isAdmin);
-      const res = await fetch(`http://localhost:8081/users/${id}/admin`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-ADMIN-TOKEN': ADMIN_TOKEN }, body: JSON.stringify({ isAdmin: nextValue }) });
+
+      const token = localStorage.getItem('authToken');
+      // No blocking here: allow toggling any account (server will persist)
+
+      const headers: Record<string,string> = { 'Content-Type': 'application/json', 'X-ADMIN-TOKEN': ADMIN_TOKEN };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      // Realizar la petición remota primero
+      const res = await fetch(`/users/${id}/admin`, { method: 'PUT', headers, body: JSON.stringify({ isAdmin: nextValue }) });
       if (!res.ok) throw new Error(String(res.status));
-      setUsers(prev => prev.map(x => ((x.id || x.userId || x.user_id) === id ? { ...x, isAdmin: nextValue } : x)));
-      setMessage(`Rol actualizado. isAdmin=${nextValue}`);
+
+      // Solo al confirmarse el éxito remoto actualizamos el estado
+      setUsers(prev => {
+        const next = prev.map(x => ((x.id || x.userId || x.user_id || x.nombre_usu || x.correo) === id ? { ...x, isAdmin: nextValue } : x));
+        return next;
+      });
+      setMessage(`Rol actualizado en el servicio. isAdmin=${nextValue}`);
+
+      // Si el usuario modificado es el usuario actualmente logueado, sincronizar desde el microservicio
+      try {
+        const local = getLocalCurrentUser();
+        const localId = local && (local.id || local.userId || local.user_id || local.nombre_usu || local.correo);
+        if (local && String(localId) === String(id)) {
+          const token = localStorage.getItem('authToken');
+          const headers: Record<string,string> = { 'Accept': 'application/json' };
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+          try {
+            const r = await fetch(`/users/${encodeURIComponent(String(id))}`, { headers });
+            if (r.ok) {
+              const updated = await r.json();
+              localStorage.setItem('currentUser', JSON.stringify(updated));
+              setUser(updated);
+              setIsAdmin(!!updated.isAdmin);
+              try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
+            } else {
+              // Fallback: si no pudimos obtener el usuario desde el servicio, mantenemos la actualización local
+              const updatedLocal = { ...local, isAdmin: nextValue };
+              localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
+              setUser(updatedLocal);
+              setIsAdmin(!!updatedLocal.isAdmin);
+              try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
+            }
+          } catch (err) {
+            console.warn('[PaginaAdmin] fallo al obtener usuario actualizado desde servicio, usando fallback local', err);
+            const updatedLocal = { ...local, isAdmin: nextValue };
+            localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
+            setUser(updatedLocal);
+            setIsAdmin(!!updatedLocal.isAdmin);
+            try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
+          }
+        }
+      } catch (err) {
+        console.warn('[PaginaAdmin] no se pudo sincronizar currentUser en localStorage', err);
+      }
     } catch (e: any) {
-      setMessage('Error actualizando rol: ' + (e?.message || e));
+      console.error('[PaginaAdmin] handleToggleAdmin error', e);
+      setMessage('Error actualizando rol en el servicio: ' + (e?.message || e));
     }
   };
 
@@ -128,7 +222,10 @@ const PaginaAdmin: React.FC = () => {
     if (!ok) return;
     try {
       const id = p.externalId || p.id;
-      const res = await fetch(`http://localhost:8082/api/posts/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string,string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE', headers });
       if (!res.ok) throw new Error(String(res.status));
       setPosts(prev => prev.filter(x => (x.externalId || x.id) !== id));
       setMessage('Publicación eliminada.');
@@ -143,7 +240,7 @@ const PaginaAdmin: React.FC = () => {
     if (!ok) return;
     try {
       const id = c.id;
-      const res = await fetch(`http://localhost:8080/contacto/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/contacto/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(String(res.status));
       setContacts(prev => prev.filter(x => x.id !== id));
       setMessage('Solicitud de contacto eliminada.');
@@ -188,11 +285,18 @@ const PaginaAdmin: React.FC = () => {
 
         {isAdmin && (
           <>
-            <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
+            <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
               <button onClick={loadUsers} disabled={loadingUsers}>{loadingUsers ? 'Cargando usuarios...' : 'Cargar usuarios'}</button>
               <button onClick={loadPosts} disabled={loadingPosts}>{loadingPosts ? 'Cargando posts...' : 'Cargar posts'}</button>
               <button onClick={() => { setMessage(null); setUsers([]); setPosts([]); }}>Limpiar</button>
+              <button onClick={checkServices} style={{ marginLeft: 8 }}>Verificar servicios</button>
             </div>
+
+            {Object.keys(serviceStatus).length > 0 && (
+              <div style={{ marginTop: 8, fontSize: 13 }}>
+                <strong>Estado servicios:</strong> {Object.entries(serviceStatus).map(([k,v]) => (<span key={k} style={{ marginLeft: 8 }}>{k}: {v}</span>))}
+              </div>
+            )}
 
             {message && <div style={{ marginTop: 12, color: '#b71c1c' }}>{message}</div>}
 
@@ -207,8 +311,23 @@ const PaginaAdmin: React.FC = () => {
                         <div style={{ fontSize: 12, color: '#666' }}>{u.correo}</div>
                       </div>
                       <div>
-                        <button onClick={() => handleToggleAdmin(u)} style={{ marginLeft: 8 }}>{u.isAdmin ? 'Quitar admin' : 'Dar admin'}</button>
-                        <button onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>Eliminar</button>
+                          {/**
+                           * Do not allow toggling admin for internal domain users (they are always admins).
+                           * Show a disabled ADMIN label for those accounts.
+                           */}
+                          {(() => {
+                            return (
+                              <>
+                                <button
+                                  onClick={() => handleToggleAdmin(u)}
+                                  style={{ marginLeft: 8 }}
+                                >
+                                  {u.isAdmin ? 'Quitar admin' : 'Dar admin'}
+                                </button>
+                              </>
+                            );
+                          })()}
+                          <button onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>Eliminar</button>
                       </div>
                     </li>
                   ))}

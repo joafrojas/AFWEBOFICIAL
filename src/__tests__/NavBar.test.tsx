@@ -2,6 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import NavBar from '../components/NavBar';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+/*
+Swagger Mock Summary: auth/user endpoints used to compute nav visibility
+  GET /auth/me
+  GET /users
+Mock global: `src/test-utils/apiMock.ts`.
+*/
 if (typeof globalThis.localStorage === 'undefined') {
   let store: Record<string, string> = {};
   globalThis.localStorage = {

@@ -26,7 +26,7 @@ const ContactForm: React.FC = () => {
         setSuccess(null);
         if (Object.keys(errs).length === 0) {
             // enviar al backend
-            fetch('http://localhost:8080/contacto/guardar', {
+            fetch('/contacto/guardar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre: name, email, mensaje: message })

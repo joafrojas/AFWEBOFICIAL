@@ -16,5 +16,17 @@ if (typeof (globalThis as any).localStorage === 'undefined') {
 if (typeof (globalThis as any).dispatchEvent === 'undefined' && typeof (globalThis as any).window !== 'undefined') {
   (globalThis as any).dispatchEvent = (globalThis as any).window.dispatchEvent.bind((globalThis as any).window);
 }
+// Instalar mock de API (mini-OpenAPI) para tests: respuestas predecibles
+try {
+  // importa de forma condicional para no romper entornos donde no existe el módulo
+  // (este archivo existe en este repo y provee respuestas example para los endpoints).
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { installApiMock } = require('./test-utils/apiMock');
+  if (typeof installApiMock === 'function') {
+    installApiMock();
+  }
+} catch (e) {
+  // ignore si no se puede instalar el mock
+}
 
 export {};

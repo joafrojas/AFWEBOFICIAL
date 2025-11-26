@@ -1,6 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+/*
+Swagger Mock Summary:
+  GET /api/posts/{id}
+  POST /api/posts/{id}/comments
+Mock global disponible en `src/test-utils/apiMock.ts`.
+*/
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import PaginaPost from '../components/Pages/PaginaPost';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { saveUser, getPosts, savePosts } from '../utils/validation';
 
 if (typeof globalThis.localStorage === 'undefined') {
@@ -49,5 +55,25 @@ describe('PaginaPost', () => {
     fireEvent.click(btn);
     const posts = getPosts();
     expect(posts.find((p:any) => p.id === 'pX')?.comments?.some((c:any) => c.text === 'Buen post!')).toBe(true);
+  });
+  it('muestra sección de comentarios al renderizar post existente', () => {
+    localStorage.setItem('currentUser', JSON.stringify({ nombre_usu: 'tester' }));
+    render(<PaginaPost />);
+    const matches = screen.queryAllByText(/Comentarios/i);
+    expect(matches.length).toBeGreaterThan(0);
+  });
+
+  it('llama POST /api/posts/:id/comments al comentar', async () => {
+    localStorage.setItem('currentUser', JSON.stringify({ nombre_usu: 'tester' }));
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    render(<PaginaPost />);
+    const textarea = screen.getByPlaceholderText(/Escribe tu comentario/i);
+    fireEvent.change(textarea, { target: { value: 'Prueba comentario' } });
+    const btn = screen.getByRole('button', { name: /Comentar/i });
+    fireEvent.click(btn);
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
+    const calledComment = fetchSpy.mock.calls.some((c: any) => typeof c[0] === 'string' && c[0].includes('/api/posts/pX/comments'));
+    expect(calledComment).toBe(true);
+    fetchSpy.mockRestore();
   });
 });

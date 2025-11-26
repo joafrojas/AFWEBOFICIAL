@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+/*
+Swagger Mock Summary: helpers-only tests (no backend calls required)
+*/
 import { validarCorreo, validarPassword, validarEdad, getUsers, saveUser } from '../utils/validation';
 
 describe('utils de validación', () => {

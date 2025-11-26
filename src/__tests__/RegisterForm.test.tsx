@@ -1,3 +1,9 @@
+/*
+Swagger Mock Summary (registro):
+  GET /users
+  POST /users (registro) — en tests se persiste en localStorage como respaldo
+Mock global en `src/test-utils/apiMock.ts`.
+*/
 import { render, screen, fireEvent } from '@testing-library/react';
 import RegisterForm from '../components/Auth/RegisterForm';
 import { describe, it, expect, beforeEach } from 'vitest';

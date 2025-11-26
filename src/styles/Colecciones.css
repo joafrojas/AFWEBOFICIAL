@@ -17,7 +17,7 @@
 
 /* Thumbnails used in the collections index - dark theme to match Gallery */
 .colecciones-thumb {
-  background: #0a0a0a;
+  background: var(--site-bg);
   padding: 10px;
   border-radius: 12px;
   text-align: left;

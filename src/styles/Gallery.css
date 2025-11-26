@@ -8,9 +8,9 @@
 }
 
 body {
-    /* Fondo negro, texto blanco */
+    /* Fondo negro, texto blanco - inherit site frame bg for full consistency */
     font-family: 'Inter', sans-serif;
-    background-color: #000;
+    background-color: var(--site-bg);
     color: #fff;
     line-height: 1.6;
 }
@@ -21,7 +21,7 @@ body {
     padding: 110px 80px 80px; 
     max-width: 1500px; /* Límite de ancho para el contenido centrado */
     margin: 0 auto; /* CENTRADO DEL CONTENIDO */
-    background-color: #000; 
+    background-color: var(--site-bg); 
     min-height: 100vh;
 }
 .editorial-post { 
@@ -235,7 +235,7 @@ body {
 .upload-modal-card {
     width: 480px;
     max-width: calc(100% - 40px);
-    background: #0a0a0a;
+    background: var(--site-bg);
     border: 1px solid rgba(255,255,255,0.06);
     padding: 18px;
     border-radius: 8px;

@@ -43,12 +43,18 @@ const NavBar: React.FC<{ onLogout?: () => void; onNavigate?: (target: string) =>
             const correo = parsed?.correo || parsed?.email || null;
 
                 let found: any = null;
+                const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+                const authHeaders: any = token ? { 'Authorization': `Bearer ${token}` } : {};
                 if (userId != null) {
                     try {
-                        // Preferir el endpoint dedicado /users/me para consultar directamente
-                        const r = await fetch(`http://localhost:8081/users/me?id=${encodeURIComponent(String(userId))}`);
-                        if (r.ok) {
-                            found = await r.json();
+                        // Preferir endpoint dedicado `/auth/me` o `/users/me` con token
+                        try {
+                                const rAuth = await fetch('/auth/me', { headers: authHeaders });
+                            if (rAuth.ok) found = await rAuth.json();
+                        } catch (e) { /* noop */ }
+                        if (!found) {
+                                const r = await fetch(`/users/me?id=${encodeURIComponent(String(userId))}`, { headers: authHeaders });
+                            if (r.ok) found = await r.json();
                         }
                     } catch (e) {
                         // fallar hacia abajo
@@ -57,7 +63,7 @@ const NavBar: React.FC<{ onLogout?: () => void; onNavigate?: (target: string) =>
 
                 if (!found) {
                     try {
-                        const res = await fetch('http://localhost:8081/users');
+                            const res = await fetch('/users', { headers: authHeaders });
                         if (!res.ok) return;
                         const users = await res.json();
                         if (username) {
@@ -123,11 +129,22 @@ const NavBar: React.FC<{ onLogout?: () => void; onNavigate?: (target: string) =>
 
     const navTo = (path: string, fallback: string) => (e: React.MouseEvent) => {
         e.preventDefault();
-        if (typeof window !== 'undefined' && window.location.pathname !== path) {
-            window.location.href = path;
-            return;
+        if (typeof window === 'undefined') return;
+
+        // Preferir navegación SPA cuando sea posible: actualizar URL y disparar
+        // un evento `popstate` para que la app principal reevalúe la ruta sin recargar.
+        try {
+            if (window.location.pathname !== path) {
+                window.history.pushState({}, '', path);
+                window.dispatchEvent(new Event('popstate'));
+                return;
+            }
+        } catch (err) {
+            // En caso de error, caer de regreso a la navegación completa
+            try { window.location.href = path; return; } catch (e) { /* noop */ }
         }
-        (typeof onNavigate === 'function') && onNavigate(fallback);
+
+        if (typeof onNavigate === 'function') onNavigate(fallback);
     };
 
     // No hay botón de demo en producción. Los admins deben obtener su flag desde el backend.
@@ -155,14 +172,12 @@ const NavBar: React.FC<{ onLogout?: () => void; onNavigate?: (target: string) =>
                                 title="Panel Admin"
                                 style={{ background: '#d9534f', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
                             >
-                                PANEL ADMIN
+                                PANEL
                             </button>
                         </li>
                     )}
                     <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {/* Indicador visible para depuración: muestra si la app considera admin (quitar en producción) */}
-                            <span style={{ color: isAdmin ? '#ffd166' : '#777', fontSize: 13 }}>{isAdmin ? 'ADMIN' : ''}</span>
                             <div className="nav-user-item">
                                 <button onClick={() => { if (onLogout) onLogout(); else window.location.href = '/'; }} className="logout-btn">Cerrar Sesión</button>
                             </div>

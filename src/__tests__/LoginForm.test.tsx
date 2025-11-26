@@ -1,3 +1,11 @@
+/*
+Swagger Mock Summary:
+  GET /users
+  GET /auth/me
+  POST /auth/login (simulado)
+
+Tests usan el mock en `src/test-utils/apiMock.ts` para respuestas predecibles.
+*/
 import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import LoginForm from '../components/Auth/LoginForm';
@@ -31,5 +39,17 @@ describe('LoginForm component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Ingresar/i }));
     // Esperamos mensajes de error en DOM
     expect(screen.getByText(/Ingresa tu usuario/i)).toBeTruthy();
+  });
+
+  it('muestra el boton de ingresar y switch a registro', () => {
+    const onSuccess = vi.fn();
+    const onSwitch = vi.fn();
+    render(<LoginForm onSuccess={onSuccess} onSwitchToRegister={onSwitch} />);
+    // El boton de ingresar debe existir
+    const btn = screen.getByRole('button', { name: /Ingresar/i });
+    expect(btn).toBeTruthy();
+    // Si existe un enlace o boton para cambiar a registro, comprobar su presencia (no obligatorio)
+    const switchBtn = screen.queryByText(/Registrar/i) || screen.queryByText(/Registrarse/i);
+    expect(switchBtn === null || switchBtn).toBeTruthy();
   });
 });

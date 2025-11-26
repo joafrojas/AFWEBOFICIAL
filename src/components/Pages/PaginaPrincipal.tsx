@@ -57,7 +57,15 @@ import { getPosts as loadStoredPosts, savePosts as persistPosts } from '../../ut
 
 const PaginaPrincipal: React.FC<PaginaPrincipalProps> = ({ currentUser, onLogout }) => {
     // estado: lista de posts (inicializamos leyendo localStorage para evitar sobreescribirlo)
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<Post[]>(() => {
+        try {
+            const parsed = loadStoredPosts();
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed as Post[];
+        } catch (e) {
+            // ignore
+        }
+        return MOCK_GRID_POSTS.slice();
+    });
     // NOTE: los comentarios se muestran únicamente en la vista detalle (/post/:id).
     // En la cuadrícula dejamos solo el botón de "like" (contador), para evitar
     // duplicar la UI de comentarios en dos sitios.
@@ -98,7 +106,7 @@ const PaginaPrincipal: React.FC<PaginaPrincipalProps> = ({ currentUser, onLogout
             form.append('authorId', currentUser?.nombre_usu || 'USUARIO_ASFALTO');
             form.append('imageFile', data.imageFile);
             try {
-                const res = await fetch('http://localhost:8082/api/posts', {
+                const res = await fetch('/api/posts', {
                     method: 'POST',
                     body: form,
                 });
@@ -148,7 +156,7 @@ const PaginaPrincipal: React.FC<PaginaPrincipalProps> = ({ currentUser, onLogout
         let mounted = true;
         (async () => {
             try {
-                const res = await fetch('http://localhost:8082/api/posts');
+                const res = await fetch('/api/posts');
                 if (res.ok) {
                     const body = await res.json();
                     if (!mounted) return;
@@ -221,7 +229,7 @@ const PaginaPrincipal: React.FC<PaginaPrincipalProps> = ({ currentUser, onLogout
         (async () => {
             try {
                 // Llamada al backend que alterna like y devuelve la publicación actualizada
-                const res = await fetch(`http://localhost:8082/api/posts/${postId}/likes`, {
+                const res = await fetch(`/api/posts/${postId}/likes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user),

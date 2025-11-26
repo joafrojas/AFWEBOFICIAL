@@ -31,7 +31,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegister }) 
         if (Object.keys(errors).length) return setFieldErrors(errors);
 
         try {
-            const res = await fetch('http://localhost:8081/auth/login', {
+            const res = await fetch('/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ usernameOrEmail: usuario, password }),
@@ -43,21 +43,65 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegister }) 
             }
             const json = await res.json();
             const token = json.token;
-            const username = json.username || usuario;
-            const isAdmin = !!json.isAdmin;
-            const createdAt = json.createdAt || '';
-            const correo = json.correo || '';
-            const fechaNac = json.fechaNac || '';
-            const userId = json.userId || null;
-
-            // guardar token y usuario mínimo (incluye id, createdAt, correo y fecha_nac)
+            // Guardar el token y un objeto "currentUser" mínimo en localStorage
             localStorage.setItem('authToken', token);
-            localStorage.setItem('currentUser', JSON.stringify({ id: userId, nombre_usu: username, correo, isAdmin, createdAt, fecha_nac: fechaNac }));
-            // Notificar a la app que cambió el usuario autenticado (para actualizar NavBar sin recargar)
-            try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
 
-            const userAny = { id: userId, rut: '', nombre: '', fecha_nac: fechaNac, correo: correo, nombre_usu: username, password: '', createdAt } as any;
-            onSuccess(userAny as UserData);
+            // Construir el usuario con la información devuelta por /auth/login
+            const userAny = {
+                id: json.userId || json.id || null,
+                nombre_usu: json.username || json.userName || usuario,
+                nombre: json.nombre || json.fullName || '',
+                correo: json.email || json.correo || '',
+                fecha_nac: json.fechaNac || '',
+                createdAt: json.createdAt || '',
+                // Determinar isAdmin por flag explícito o por dominio de correo
+                isAdmin: Boolean(json.isAdmin) || (json.email || json.correo || '').toString().endsWith('@asfaltofashion.cl')
+            } as any;
+
+            // Intentar obtener perfil completo desde el backend (/auth/me o /users/me)
+            let finalUser: any = userAny;
+            try {
+                const authHeaders: Record<string,string> = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' };
+                // Preferir /auth/me
+                try {
+                    const r = await fetch('/auth/me', { headers: authHeaders });
+                    if (r.ok) {
+                        const p = await r.json();
+                        finalUser = p;
+                    }
+                } catch (e) { /* noop */ }
+
+                // Si no obtuvimos perfil, intentar /users/me (backend soporta ?id=... but also /users/me)
+                if (!finalUser || !finalUser.id) {
+                    try {
+                        const r2 = await fetch('/users/me', { headers: authHeaders });
+                        if (r2.ok) {
+                            const p2 = await r2.json();
+                            finalUser = p2;
+                        }
+                    } catch (e) { /* noop */ }
+                }
+
+            } catch (e) {
+                // si todo falla, usamos el objeto mínimo construido arriba
+            }
+
+            try {
+                localStorage.setItem('currentUser', JSON.stringify(finalUser));
+                window.dispatchEvent(new Event('asfalto_auth_updated'));
+                try { console.info('[LoginForm] stored currentUser and dispatching asfalto_auth_started'); } catch (e) {}
+                try { window.dispatchEvent(new Event('asfalto_auth_started')); } catch (e) {}
+            } catch (e) { /* noop */ }
+
+            // Informar al app y forzar la URL de carga sin recargar la página.
+            onSuccess(finalUser as UserData);
+            try {
+                if (typeof window !== 'undefined') {
+                    window.history.pushState({}, '', '/?forceCarga=1');
+                    // opcional: disparar evento de navegación para que la app actualice ruta
+                    try { window.dispatchEvent(new Event('asfalto_navigate')); } catch (e) {}
+                }
+            } catch (e) { /* noop */ }
         } catch (err: any) {
             setFieldErrors({ password: err?.message || 'Error conectando al servidor' });
         }

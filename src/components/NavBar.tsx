@@ -171,8 +171,8 @@ const NavBar: React.FC<{ onLogout?: () => void; onNavigate?: (target: string) =>
                                 aria-label="Ir al panel de administración"
                                 title="Panel Admin"
                                 style={{ background: '#d9534f', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
-                            >
-                                PANEL
+                                >
+                                ADMIN
                             </button>
                         </li>
                     )}

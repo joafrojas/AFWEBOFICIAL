@@ -1,34 +1,35 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+// https://vite.dev/config/ (documentación de Vite)
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy API calls to local microservices to avoid CORS in development
-      // Map frontend prefixes to the microservices' context paths.
+      // Proxy para llamadas a APIs hacia microservicios locales (evita CORS en desarrollo)
+      // Mapea los prefijos del frontend a los context-path de cada microservicio.
       '^/users': {
         target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/users/, '/usuarios-api/users'),
-        // Remove WWW-Authenticate header from proxied responses and handle connection errors
+        // Elimina la cabecera WWW-Authenticate de las respuestas proxy y maneja errores de conexión
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes && proxyRes.headers) delete proxyRes.headers['www-authenticate'];
           });
-          proxy.on('error', (err, req, res) => {
-            // Log concise error and send a 502 JSON so frontend receives a proper response
-            // (prevents Node aggregate errors flooding the terminal)
+          proxy.on('error', (err: any, _req: any, res: any) => {
+            // Registra un error conciso y responde con un 502 JSON para que el frontend reciba
+            // una respuesta adecuada (evita que múltiples errores inunden la terminal).
             // eslint-disable-next-line no-console
-            console.error('[vite proxy] target connection error:', err && err.code ? err.code : err?.message || err);
+            console.error('[vite proxy] error de conexión al target:', err && (err as any).code ? (err as any).code : err?.message || err);
             try {
-              if (res && !res.headersSent) {
-                res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Service unavailable', code: err && err.code }));
+              const r: any = res;
+              if (r && !r.headersSent) {
+                r.writeHead(502, { 'Content-Type': 'application/json' });
+                r.end(JSON.stringify({ error: 'Servicio no disponible', code: err && (err as any).code }));
               }
-            } catch (e) { /* ignore */ }
+            } catch (e) { /* ignorar */ }
           });
         }
       },
@@ -41,13 +42,14 @@ export default defineConfig({
           proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes && proxyRes.headers) delete proxyRes.headers['www-authenticate'];
           });
-          proxy.on('error', (err, req, res) => {
+          proxy.on('error', (err: any, _req: any, res: any) => {
             // eslint-disable-next-line no-console
-            console.error('[vite proxy] target connection error:', err && err.code ? err.code : err?.message || err);
+            console.error('[vite proxy] target connection error:', err && (err as any).code ? (err as any).code : err?.message || err);
             try {
-              if (res && !res.headersSent) {
-                res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Service unavailable', code: err && err.code }));
+              const r: any = res;
+              if (r && !r.headersSent) {
+                r.writeHead(502, { 'Content-Type': 'application/json' });
+                r.end(JSON.stringify({ error: 'Service unavailable', code: err && (err as any).code }));
               }
             } catch (e) { /* ignore */ }
           });
@@ -62,13 +64,14 @@ export default defineConfig({
           proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes && proxyRes.headers) delete proxyRes.headers['www-authenticate'];
           });
-          proxy.on('error', (err, req, res) => {
+          proxy.on('error', (err: any, _req: any, res: any) => {
             // eslint-disable-next-line no-console
-            console.error('[vite proxy] target connection error:', err && err.code ? err.code : err?.message || err);
+            console.error('[vite proxy] target connection error:', err && (err as any).code ? (err as any).code : err?.message || err);
             try {
-              if (res && !res.headersSent) {
-                res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Service unavailable', code: err && err.code }));
+              const r: any = res;
+              if (r && !r.headersSent) {
+                r.writeHead(502, { 'Content-Type': 'application/json' });
+                r.end(JSON.stringify({ error: 'Service unavailable', code: err && (err as any).code }));
               }
             } catch (e) { /* ignore */ }
           });
@@ -83,13 +86,14 @@ export default defineConfig({
           proxy.on('proxyRes', (proxyRes) => {
             if (proxyRes && proxyRes.headers) delete proxyRes.headers['www-authenticate'];
           });
-          proxy.on('error', (err, req, res) => {
+          proxy.on('error', (err: any, _req: any, res: any) => {
             // eslint-disable-next-line no-console
-            console.error('[vite proxy] target connection error:', err && err.code ? err.code : err?.message || err);
+            console.error('[vite proxy] target connection error:', err && (err as any).code ? (err as any).code : err?.message || err);
             try {
-              if (res && !res.headersSent) {
-                res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Service unavailable', code: err && err.code }));
+              const r: any = res;
+              if (r && !r.headersSent) {
+                r.writeHead(502, { 'Content-Type': 'application/json' });
+                r.end(JSON.stringify({ error: 'Service unavailable', code: err && (err as any).code }));
               }
             } catch (e) { /* ignore */ }
           });

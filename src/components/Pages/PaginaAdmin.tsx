@@ -324,6 +324,9 @@ const PaginaAdmin: React.FC = () => {
                               <button className="btn-secondary" onClick={() => handleToggleAdmin(u)} style={{ marginLeft: 8 }}>
                                 {String(u.rol || '').toUpperCase() === 'ROLE_ADMIN' ? 'Quitar admin' : 'Dar admin'}
                               </button>
+                              <button className="btn-danger" onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>
+                                Eliminar
+                              </button>
                             </td>
                           </tr>
                       ))}

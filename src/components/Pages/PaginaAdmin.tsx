@@ -51,9 +51,11 @@ const PaginaAdmin: React.FC = () => {
       const token = localStorage.getItem('authToken');
       const headers: Record<string,string> = { 'Accept': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
+      // Use the proxied usuarios endpoint (Vite proxy maps /users -> usuarios microservice)
       const res = await fetch('/users', { headers });
       if (!res.ok) throw new Error(`users ${res.status}`);
       const body = await res.json();
+      // Expect body items like { id, nombreUsuario, rol }
       setUsers(Array.isArray(body) ? body : []);
     } catch (e: any) {
       setMessage('No se pudieron cargar usuarios desde el servicio: ' + (e?.message || e));
@@ -154,56 +156,56 @@ const PaginaAdmin: React.FC = () => {
   const handleToggleAdmin = async (u: User) => {
     if (!isAdmin) { alert('Solo administradores pueden cambiar roles.'); return; }
     try {
-      const id = u.id || u.userId || u.user_id || u.nombre_usu || u.correo;
-      const nextValue = !Boolean(u.isAdmin);
+      const id = u.id;
+      // Determine current admin state from the provided role string
+      const currentIsAdmin = String(u.rol || u.role).toUpperCase() === 'ROLE_ADMIN';
+      const nextValue = !currentIsAdmin;
 
       const token = localStorage.getItem('authToken');
-      // No blocking here: allow toggling any account (server will persist)
-
       const headers: Record<string,string> = { 'Content-Type': 'application/json', 'X-ADMIN-TOKEN': ADMIN_TOKEN };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      // Realizar la petición remota primero
-      const res = await fetch(`/users/${id}/admin`, { method: 'PUT', headers, body: JSON.stringify({ isAdmin: nextValue }) });
+      const res = await fetch(`/users/${encodeURIComponent(String(id))}/admin`, { method: 'PUT', headers, body: JSON.stringify({ isAdmin: nextValue }) });
       if (!res.ok) throw new Error(String(res.status));
 
-      // Solo al confirmarse el éxito remoto actualizamos el estado
-      setUsers(prev => {
-        const next = prev.map(x => ((x.id || x.userId || x.user_id || x.nombre_usu || x.correo) === id ? { ...x, isAdmin: nextValue } : x));
-        return next;
-      });
-      setMessage(`Rol actualizado en el servicio. isAdmin=${nextValue}`);
+      // Prefer to read updated user returned by backend so we can sync immediately
+      let updatedUser: any = null;
+      try {
+        updatedUser = await res.json();
+      } catch (e) {
+        // ignore parse errors — we'll reload list below
+      }
 
-      // Si el usuario modificado es el usuario actualmente logueado, sincronizar desde el microservicio
+      setMessage(`Rol actualizado en el servicio. isAdmin=${nextValue}`);
+      // If backend returned updated user and it's the current user, update localStorage and UI
+      const local = getLocalCurrentUser();
+      if (updatedUser && local && String(local.id) === String(id)) {
+        try {
+          const updatedLocal = { ...local, ...updatedUser, isAdmin: updatedUser.isAdmin || nextValue, rol: updatedUser.rol || (nextValue ? 'ROLE_ADMIN' : 'ROLE_USER') };
+          localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
+          setUser(updatedLocal);
+          setIsAdmin(!!updatedLocal.isAdmin || String(updatedLocal.rol).toUpperCase() === 'ROLE_ADMIN');
+          try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
+        } catch (e) { /* ignore */ }
+      }
+
+      // reload the list to reflect new role values from backend
+      await loadUsers();
+
+      // If the changed user is the current user, try to sync localStorage
       try {
         const local = getLocalCurrentUser();
-        const localId = local && (local.id || local.userId || local.user_id || local.nombre_usu || local.correo);
+        const localId = local && local.id;
         if (local && String(localId) === String(id)) {
           const token = localStorage.getItem('authToken');
           const headers: Record<string,string> = { 'Accept': 'application/json' };
           if (token) headers['Authorization'] = `Bearer ${token}`;
-          try {
-            const r = await fetch(`/users/${encodeURIComponent(String(id))}`, { headers });
-            if (r.ok) {
-              const updated = await r.json();
-              localStorage.setItem('currentUser', JSON.stringify(updated));
-              setUser(updated);
-              setIsAdmin(!!updated.isAdmin);
-              try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
-            } else {
-              // Fallback: si no pudimos obtener el usuario desde el servicio, mantenemos la actualización local
-              const updatedLocal = { ...local, isAdmin: nextValue };
-              localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
-              setUser(updatedLocal);
-              setIsAdmin(!!updatedLocal.isAdmin);
-              try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
-            }
-          } catch (err) {
-            console.warn('[PaginaAdmin] fallo al obtener usuario actualizado desde servicio, usando fallback local', err);
-            const updatedLocal = { ...local, isAdmin: nextValue };
-            localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
-            setUser(updatedLocal);
-            setIsAdmin(!!updatedLocal.isAdmin);
+          const r = await fetch(`/users/${encodeURIComponent(String(id))}`, { headers });
+          if (r.ok) {
+            const updated = await r.json();
+            localStorage.setItem('currentUser', JSON.stringify(updated));
+            setUser(updated);
+            setIsAdmin(!!updated.isAdmin || String(updated.rol).toUpperCase() === 'ROLE_ADMIN');
             try { window.dispatchEvent(new Event('asfalto_auth_updated')); } catch (e) { /* noop */ }
           }
         }
@@ -303,36 +305,31 @@ const PaginaAdmin: React.FC = () => {
             <section style={{ marginTop: 20 }}>
               <h2>Usuarios</h2>
               {users.length === 0 ? <p>No hay usuarios cargados.</p> : (
-                <ul>
-                  {users.map(u => (
-                    <li key={(u.id || u.userId || u.user_id || u.nombre_usu || u.correo)} style={{ display: 'flex', justifyContent: 'space-between', padding: 8, borderBottom: '1px solid #eee' }}>
-                      <div>
-                        <div><strong>{u.nombre || u.nombre_usu || u.username}</strong></div>
-                        <div style={{ fontSize: 12, color: '#fa8b8bff' }}>{u.correo}</div>
-                      </div>
-                      <div>
-                          {/**
-                           * Do not allow toggling admin for internal domain users (they are always admins).
-                           * Show a disabled ADMIN label for those accounts.
-                           */}
-                          {(() => {
-                            return (
-                              <>
-                                <button
-                                  className="btn-secondary"
-                                  onClick={() => handleToggleAdmin(u)}
-                                  style={{ marginLeft: 8 }}
-                                >
-                                  {u.isAdmin ? 'Quitar admin' : 'Dar admin'}
-                                </button>
-                              </>
-                            );
-                          })()}
-                          <button className="btn-danger" onClick={() => handleDeleteUser(u)} style={{ marginLeft: 8 }}>Eliminar</button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left', borderBottom: '2px solid #ddd' }}>
+                        <th style={{ padding: '8px' }}>ID</th>
+                        <th style={{ padding: '8px' }}>Nombre de usuario</th>
+                        <th style={{ padding: '8px' }}>Rol</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map(u => (
+                          <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
+                            <td style={{ padding: '8px', verticalAlign: 'middle' }}>{u.id}</td>
+                            <td style={{ padding: '8px', verticalAlign: 'middle' }}>{u.nombreUsuario}</td>
+                            <td style={{ padding: '8px', verticalAlign: 'middle' }}>{u.rol}</td>
+                            <td style={{ padding: '8px', verticalAlign: 'middle', textAlign: 'right' }}>
+                              <button className="btn-secondary" onClick={() => handleToggleAdmin(u)} style={{ marginLeft: 8 }}>
+                                {String(u.rol || '').toUpperCase() === 'ROLE_ADMIN' ? 'Quitar admin' : 'Dar admin'}
+                              </button>
+                            </td>
+                          </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </section>
 
